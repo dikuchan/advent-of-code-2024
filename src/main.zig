@@ -1,6 +1,7 @@
 const std = @import("std");
 
 const @"01" = @import("./01/solution.zig").Solution;
+const @"02" = @import("./02/solution.zig").Solution;
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -21,6 +22,7 @@ pub fn main() !void {
     );
     try switch (task_n) {
         1 => solve(allocator, @"01"{}),
+        2 => solve(allocator, @"02"{}),
         else => unreachable,
     };
 }
