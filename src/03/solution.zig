@@ -1,9 +1,5 @@
 const std = @import("std");
 
-const Error = error{
-    NoParse,
-};
-
 const IN: []const u8 = @embedFile("in.txt");
 
 pub const Solution = struct {
@@ -18,7 +14,6 @@ pub const Solution = struct {
                 answer += r.value;
                 position = r.position;
             } else |_| {
-                // TODO: Skip more.
                 position += 1;
             }
         }
@@ -63,8 +58,9 @@ fn Parsed(comptime T: type) type {
     };
 }
 
-const ParsedNumber = Parsed(i64);
-const ParsedOperation = Parsed(i64);
+const Error = error{
+    NoParse,
+};
 
 fn parseIdentifier(s: []const u8, position: usize, id: []const u8) Error!usize {
     for (0.., id) |i, c| {
@@ -76,7 +72,7 @@ fn parseIdentifier(s: []const u8, position: usize, id: []const u8) Error!usize {
     return position + id.len;
 }
 
-fn parseNumber(s: []const u8, position: usize) Error!ParsedNumber {
+fn parseNumber(s: []const u8, position: usize) Error!Parsed(i64) {
     var n: i64 = 0;
     for (0.., s[position..]) |i, c| {
         if (c >= '0' and c <= '9') {
@@ -95,7 +91,7 @@ fn parseNumber(s: []const u8, position: usize) Error!ParsedNumber {
     return Error.NoParse;
 }
 
-fn parseOperation(s: []const u8, iposition: usize) Error!ParsedOperation {
+fn parseOperation(s: []const u8, iposition: usize) Error!Parsed(i64) {
     var position = iposition;
     position = try parseIdentifier(s, position, "mul(");
     const x = try parseNumber(s, position);
