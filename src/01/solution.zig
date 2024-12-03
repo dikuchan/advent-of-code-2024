@@ -2,16 +2,24 @@ const std = @import("std");
 
 const LineReader = @import("../utils.zig").LineReader;
 
-const IN: []const u8 = @embedFile("in.txt");
+pub const IN = @embedFile("in.txt");
 
-pub const Solution = struct {
-    pub fn @"1"(allocator: std.mem.Allocator) !u64 {
+pub const Solver = struct {
+    in: []const u8,
+
+    pub fn init(in: []const u8) Solver {
+        return .{
+            .in = in,
+        };
+    }
+
+    pub fn @"1"(self: Solver, allocator: std.mem.Allocator) !u64 {
         var xs = std.ArrayList(i64).init(allocator);
         defer xs.deinit();
         var ys = std.ArrayList(i64).init(allocator);
         defer ys.deinit();
 
-        var reader = LineReader.init(IN);
+        var reader = LineReader.init(self.in);
         var buffer: [1024]u8 = undefined;
         while (try reader.readLine(&buffer)) |line| {
             var iter = std.mem.splitSequence(u8, line, "   ");
@@ -33,13 +41,13 @@ pub const Solution = struct {
         return answer;
     }
 
-    pub fn @"2"(allocator: std.mem.Allocator) !u64 {
+    pub fn @"2"(self: Solver, allocator: std.mem.Allocator) !u64 {
         var xs = std.ArrayList(u64).init(allocator);
         defer xs.deinit();
         var ys = std.AutoHashMap(u64, u64).init(allocator);
         defer ys.deinit();
 
-        var reader = LineReader.init(IN);
+        var reader = LineReader.init(self.in);
         var buffer: [1024]u8 = undefined;
         while (try reader.readLine(&buffer)) |line| {
             var iter = std.mem.splitSequence(u8, line, "   ");
@@ -58,3 +66,13 @@ pub const Solution = struct {
         return answer;
     }
 };
+
+test {
+    const IN_TEST = @embedFile("in_test.txt");
+    var solver = Solver.init(IN_TEST);
+
+    const allocator = std.testing.allocator;
+
+    try std.testing.expect(try solver.@"1"(allocator) == 11);
+    try std.testing.expect(try solver.@"2"(allocator) == 31);
+}

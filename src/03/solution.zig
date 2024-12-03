@@ -1,16 +1,24 @@
 const std = @import("std");
 
-const IN: []const u8 = @embedFile("in.txt");
+pub const IN: []const u8 = @embedFile("in.txt");
 
-pub const Solution = struct {
-    pub fn @"1"(_: std.mem.Allocator) !i64 {
+pub const Solver = struct {
+    in: []const u8,
+
+    pub fn init(in: []const u8) Solver {
+        return .{
+            .in = in,
+        };
+    }
+
+    pub fn @"1"(self: Solver, _: std.mem.Allocator) anyerror!i64 {
         var answer: i64 = 0;
         var position: usize = 0;
         while (true) {
-            if (position >= IN.len) {
+            if (position >= self.in.len) {
                 break;
             }
-            if (parseOperation(IN, position)) |r| {
+            if (parseOperation(self.in, position)) |r| {
                 answer += r.value;
                 position = r.position;
             } else |_| {
@@ -20,25 +28,25 @@ pub const Solution = struct {
         return answer;
     }
 
-    pub fn @"2"(_: std.mem.Allocator) !i64 {
+    pub fn @"2"(self: Solver, _: std.mem.Allocator) anyerror!i64 {
         var answer: i64 = 0;
         var enabled = true;
         var position: usize = 0;
         while (true) {
-            if (position >= IN.len) {
+            if (position >= self.in.len) {
                 break;
             }
-            if (parseOperation(IN, position)) |r| {
+            if (parseOperation(self.in, position)) |r| {
                 if (enabled) {
                     answer += r.value;
                 }
                 position = r.position;
             } else |_| {
-                if (parseIdentifier(IN, position, "do()")) |r| {
+                if (parseIdentifier(self.in, position, "do()")) |r| {
                     enabled = true;
                     position = r;
                 } else |_| {
-                    if (parseIdentifier(IN, position, "don't()")) |r| {
+                    if (parseIdentifier(self.in, position, "don't()")) |r| {
                         enabled = false;
                         position = r;
                     } else |_| {
@@ -104,4 +112,22 @@ fn parseOperation(s: []const u8, iposition: usize) Error!Parsed(i64) {
         .value = x.value * y.value,
         .position = position,
     };
+}
+
+test "01" {
+    const IN_TEST = @embedFile("in_test_01.txt");
+    var solver = Solver.init(IN_TEST);
+
+    const allocator = std.testing.allocator;
+
+    try std.testing.expect(try solver.@"1"(allocator) == 161);
+}
+
+test "02" {
+    const IN_TEST = @embedFile("in_test_02.txt");
+    var solver = Solver.init(IN_TEST);
+
+    const allocator = std.testing.allocator;
+
+    try std.testing.expect(try solver.@"2"(allocator) == 48);
 }
