@@ -27,29 +27,30 @@ pub fn main() !void {
         args.next() orelse unreachable,
         10,
     );
+
     try switch (task_n) {
         1 => solveAlloc(allocator, task_01, in_01),
         2 => solveAlloc(allocator, task_02, in_02),
-        3 => solve(task_03, in_03), // may solve in comptime
-        4 => solve(task_04, in_04), // may solve in comptime
+        3 => solve(task_03, in_03, false),
+        4 => solve(task_04, in_04, false),
         else => unreachable,
     };
 }
 
-fn solve(comptime task: anytype, in: []const u8) !void {
-    print(1, try task.@"1"(in));
-    print(2, try task.@"2"(in));
+fn solve(comptime task: anytype, comptime in: []const u8, comptime in_comptime: bool) !void {
+    if (in_comptime) {
+        @setEvalBranchQuota(1_000_000);
+        print(1, comptime try task.@"1"(in));
+        print(2, comptime try task.@"2"(in));
+    } else {
+        print(1, try task.@"1"(in));
+        print(2, try task.@"2"(in));
+    }
 }
 
 fn solveAlloc(allocator: std.mem.Allocator, comptime task: anytype, in: []const u8) !void {
     print(1, try task.@"1"(allocator, in));
     print(2, try task.@"2"(allocator, in));
-}
-
-fn solveComptime(comptime task: anytype, comptime in: []const u8) !void {
-    @setEvalBranchQuota(1_000_000);
-    print(1, comptime try task.@"1"(in));
-    print(2, comptime try task.@"2"(in));
 }
 
 fn print(comptime n: comptime_int, answer: u64) void {
