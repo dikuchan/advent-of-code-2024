@@ -1,4 +1,8 @@
-pub fn @"1"(in: []const u8) Error!u64 {
+const std = @import("std");
+
+const common = @import("../common.zig");
+
+pub fn @"1"(in: []const u8) common.Error!u64 {
     var answer: u64 = 0;
     var position: usize = 0;
     while (true) {
@@ -15,7 +19,7 @@ pub fn @"1"(in: []const u8) Error!u64 {
     return answer;
 }
 
-pub fn @"2"(in: []const u8) Error!u64 {
+pub fn @"2"(in: []const u8) common.Error!u64 {
     var answer: u64 = 0;
     var enabled = true;
     var position: usize = 0;
@@ -29,11 +33,11 @@ pub fn @"2"(in: []const u8) Error!u64 {
             }
             position = r.position;
         } else |_| {
-            if (parseIdentifier(in, position, "do()")) |r| {
+            if (common.parseIdentifier(in, position, "do()")) |r| {
                 enabled = true;
                 position = r;
             } else |_| {
-                if (parseIdentifier(in, position, "don't()")) |r| {
+                if (common.parseIdentifier(in, position, "don't()")) |r| {
                     enabled = false;
                     position = r;
                 } else |_| {
@@ -45,73 +49,25 @@ pub fn @"2"(in: []const u8) Error!u64 {
     return answer;
 }
 
-fn Parsed(comptime T: type) type {
-    return struct {
-        value: T,
-        position: usize,
-    };
-}
-
-const Error = error{
-    NoParse,
-};
-
-fn parseIdentifier(s: []const u8, position: usize, id: []const u8) Error!usize {
-    for (0.., id) |i, c| {
-        const e = s[position + i];
-        if (c != e) {
-            return Error.NoParse;
-        }
-    }
-    return position + id.len;
-}
-
-fn parseNumber(s: []const u8, position: usize) Error!Parsed(u64) {
-    var n: u64 = 0;
-    for (0.., s[position..]) |i, c| {
-        if (c >= '0' and c <= '9') {
-            n *= 10;
-            n += c - '0';
-        } else {
-            if (i == 0) {
-                return Error.NoParse;
-            }
-            return .{
-                .value = n,
-                .position = position + i,
-            };
-        }
-    }
-    return Error.NoParse;
-}
-
-fn parseOperation(s: []const u8, iposition: usize) Error!Parsed(u64) {
+fn parseOperation(s: []const u8, iposition: usize) common.Error!common.Parsed(u64) {
     var position = iposition;
-    position = try parseIdentifier(s, position, "mul(");
-    const x = try parseNumber(s, position);
-    position = x.position;
-    position = try parseIdentifier(s, position, ",");
-    const y = try parseNumber(s, position);
-    position = y.position;
-    position = try parseIdentifier(s, position, ")");
+    position = try common.parseIdentifier(s, position, "mul(");
+    const x = try common.parseNumber(s, position);
+    position = try common.parseIdentifier(s, x.position, ",");
+    const y = try common.parseNumber(s, position);
+    position = try common.parseIdentifier(s, y.position, ")");
     return .{
         .value = x.value * y.value,
         .position = position,
     };
 }
 
-const std = @import("std");
-
 test "1" {
     const in = @embedFile("in_test_01.txt");
-    comptime {
-        try std.testing.expectEqual(161, try @"1"(in));
-    }
+    try comptime std.testing.expectEqual(161, try @"1"(in));
 }
 
 test "2" {
     const in = @embedFile("in_test_02.txt");
-    comptime {
-        try std.testing.expectEqual(48, try @"2"(in));
-    }
+    try comptime std.testing.expectEqual(48, try @"2"(in));
 }

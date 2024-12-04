@@ -39,14 +39,12 @@ pub fn @"2"(in: []const u8) common.Error!u64 {
         }
     }
     var counts = common.array(u64, max + 1);
-    for (0..n) |i| {
-        const y = ys[i];
+    for (ys) |y| {
         counts[y] += 1;
     }
 
     var answer = 0;
-    for (0..n) |i| {
-        const x = xs[i];
+    for (xs) |x| {
         const count = counts[x];
         answer += x * count;
     }

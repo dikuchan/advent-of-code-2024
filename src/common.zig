@@ -18,6 +18,7 @@ pub fn countLines(s: []const u8) usize {
 
 pub const Error = error{
     NoParse,
+    InvalidBuffer,
 };
 
 pub fn Parsed(comptime T: type) type {
@@ -101,7 +102,7 @@ pub const LineReader = struct {
 
         const line_length = i - self.position;
         if (line_length > buffer.len) {
-            return Error.BufferTooSmall;
+            return Error.InvalidBuffer;
         }
 
         @memcpy(buffer[0..line_length], self.s[self.position..i]);

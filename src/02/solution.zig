@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const LineReader = @import("../utils.zig").LineReader;
+const LineReader = @import("../common.zig").LineReader;
 
 pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
     var answer: u64 = 0;

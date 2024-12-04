@@ -1,3 +1,5 @@
+const std = @import("std");
+
 const Error = error{};
 
 pub fn @"1"(in: []const u8) Error!u64 {
@@ -132,8 +134,6 @@ fn findMAS(
     }
     return false;
 }
-
-const std = @import("std");
 
 test {
     const in = @embedFile("in_test.txt");

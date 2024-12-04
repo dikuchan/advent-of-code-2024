@@ -4,12 +4,12 @@ const task_n = @import("options").task_n;
 
 pub fn main() !void {
     const answer = comptime blk: {
-        try switch (task_n) {
+        switch (task_n) {
             1 => break :blk try solve(@import("./01/solution.zig")),
             3 => break :blk try solve(@import("./03/solution.zig")),
             4 => break :blk try solve(@import("./04/solution.zig")),
             else => @compileError("no such task"),
-        };
+        }
     };
     answer.print();
 }
