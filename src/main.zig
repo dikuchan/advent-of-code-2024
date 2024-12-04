@@ -1,8 +1,12 @@
 const std = @import("std");
 
-const @"01" = @import("./01/solution.zig");
-const @"02" = @import("./02/solution.zig");
-const @"03" = @import("./03/solution.zig");
+const task_01 = @import("./01/solution.zig");
+const task_02 = @import("./02/solution.zig");
+const task_03 = @import("./03/solution.zig");
+
+const in_01 = @embedFile("./01/in.txt");
+const in_02 = @embedFile("./02/in.txt");
+const in_03 = @embedFile("./03/in.txt");
 
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
@@ -22,24 +26,24 @@ pub fn main() !void {
         10,
     );
     try switch (task_n) {
-        1 => solve(allocator, @"01".Solver.init(@"01".IN)),
-        2 => solve(allocator, @"02".Solver.init(@"02".IN)),
-        3 => solve(allocator, @"03".Solver.init(@"03".IN)),
+        1 => solve(task_01, in_01, allocator),
+        2 => solve(task_02, in_02, allocator),
+        3 => solve(task_03, in_03, allocator),
         else => unreachable,
     };
 }
 
-fn solve(allocator: std.mem.Allocator, comptime solver: anytype) !void {
+fn solve(comptime task: anytype, in: []const u8, allocator: std.mem.Allocator) !void {
     std.debug.print(
         "Answer 1: {d}\n",
         .{
-            .answer = try solver.@"1"(allocator),
+            .answer = try task.@"1"(in, allocator),
         },
     );
     std.debug.print(
         "Answer 2: {d}\n",
         .{
-            .answer = try solver.@"2"(allocator),
+            .answer = try task.@"2"(in, allocator),
         },
     );
 }

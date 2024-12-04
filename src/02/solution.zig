@@ -2,65 +2,53 @@ const std = @import("std");
 
 const LineReader = @import("../utils.zig").LineReader;
 
-pub const IN: []const u8 = @embedFile("in.txt");
-
-pub const Solver = struct {
-    in: []const u8,
-
-    pub fn init(in: []const u8) Solver {
-        return .{
-            .in = in,
-        };
+pub fn @"1"(in: []const u8, allocator: std.mem.Allocator) !u64 {
+    var answer: u64 = 0;
+    var reader = LineReader.init(in);
+    var buffer: [1024]u8 = undefined;
+    while (try reader.readLine(&buffer)) |line| {
+        var iter = std.mem.splitSequence(u8, line, " ");
+        var xs = std.ArrayList(i64).init(allocator);
+        defer xs.deinit();
+        while (iter.next()) |s| {
+            const x = try std.fmt.parseInt(i64, s, 10);
+            try xs.append(x);
+        }
+        if (try check(allocator, xs.items)) {
+            answer += 1;
+        }
     }
+    return answer;
+}
 
-    pub fn @"1"(self: Solver, allocator: std.mem.Allocator) !u64 {
-        var answer: u64 = 0;
-        var reader = LineReader.init(self.in);
-        var buffer: [1024]u8 = undefined;
-        while (try reader.readLine(&buffer)) |line| {
-            var iter = std.mem.splitSequence(u8, line, " ");
-            var xs = std.ArrayList(i64).init(allocator);
-            defer xs.deinit();
-            while (iter.next()) |s| {
-                const x = try std.fmt.parseInt(i64, s, 10);
-                try xs.append(x);
+pub fn @"2"(in: []const u8, allocator: std.mem.Allocator) !u64 {
+    var answer: u64 = 0;
+    var reader = LineReader.init(in);
+    var buffer: [1024]u8 = undefined;
+    while (try reader.readLine(&buffer)) |line| {
+        var iter = std.mem.splitSequence(u8, line, " ");
+        var xs = std.ArrayList(i64).init(allocator);
+        defer xs.deinit();
+        while (iter.next()) |s| {
+            const x = try std.fmt.parseInt(i64, s, 10);
+            try xs.append(x);
+        }
+        for (0..xs.items.len) |i| {
+            var ys = std.ArrayList(i64).init(allocator);
+            defer ys.deinit();
+            for (0.., xs.items) |j, x| {
+                if (i != j) {
+                    try ys.append(x);
+                }
             }
-            if (try check(allocator, xs.items)) {
+            if (try check(allocator, ys.items)) {
                 answer += 1;
+                break;
             }
         }
-        return answer;
     }
-
-    pub fn @"2"(self: Solver, allocator: std.mem.Allocator) !u64 {
-        var answer: u64 = 0;
-        var reader = LineReader.init(self.in);
-        var buffer: [1024]u8 = undefined;
-        while (try reader.readLine(&buffer)) |line| {
-            var iter = std.mem.splitSequence(u8, line, " ");
-            var xs = std.ArrayList(i64).init(allocator);
-            defer xs.deinit();
-            while (iter.next()) |s| {
-                const x = try std.fmt.parseInt(i64, s, 10);
-                try xs.append(x);
-            }
-            for (0..xs.items.len) |i| {
-                var ys = std.ArrayList(i64).init(allocator);
-                defer ys.deinit();
-                for (0.., xs.items) |j, x| {
-                    if (i != j) {
-                        try ys.append(x);
-                    }
-                }
-                if (try check(allocator, ys.items)) {
-                    answer += 1;
-                    break;
-                }
-            }
-        }
-        return answer;
-    }
-};
+    return answer;
+}
 
 fn check_bounds(xs: []const i64, lower: i64, upper: i64) bool {
     for (xs) |x| {
@@ -93,11 +81,9 @@ fn check(allocator: std.mem.Allocator, xs: []const i64) !bool {
 }
 
 test {
-    const IN_TEST = @embedFile("in_test.txt");
-    var solver = Solver.init(IN_TEST);
-
+    const in = @embedFile("in_test.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expect(try solver.@"1"(allocator) == 2);
-    try std.testing.expect(try solver.@"2"(allocator) == 4);
+    try std.testing.expect(try @"1"(in, allocator) == 2);
+    try std.testing.expect(try @"2"(in, allocator) == 4);
 }
