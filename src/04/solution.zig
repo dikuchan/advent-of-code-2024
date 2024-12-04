@@ -74,7 +74,7 @@ const Board = struct {
     }
 };
 
-const Direction = union(enum) {
+const Direction = enum {
     @"0",
     @"45",
     @"90",
