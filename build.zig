@@ -7,13 +7,18 @@ pub fn build(b: *std.Build) void {
         .target = b.host,
     });
 
+    const options = b.addOptions();
+    options.addOption(
+        u32,
+        "task_n",
+        b.option(u32, "task", "Task number") orelse 0,
+    );
+    exe.root_module.addOptions("options", options);
+
     b.installArtifact(exe);
 
     const run_exe = b.addRunArtifact(exe);
     run_exe.step.dependOn(b.getInstallStep());
-    if (b.args) |args| {
-        run_exe.addArgs(args);
-    }
 
     const run_step = b.step("run", "Run application");
     run_step.dependOn(&run_exe.step);
@@ -22,7 +27,6 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/tests.zig"),
         .target = b.host,
     });
-
     const run_tests = b.addRunArtifact(tests);
 
     const run_tests_step = b.step("test", "Run tests");

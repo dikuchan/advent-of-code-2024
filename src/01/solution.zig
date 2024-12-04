@@ -1,64 +1,75 @@
 const std = @import("std");
 
-const LineReader = @import("../utils.zig").LineReader;
+const common = @import("../common.zig");
 
-pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
-    var xs = std.ArrayList(i64).init(allocator);
-    defer xs.deinit();
-    var ys = std.ArrayList(i64).init(allocator);
-    defer ys.deinit();
+pub fn @"1"(in: []const u8) common.Error!u64 {
+    const n = common.countLines(in);
 
-    var reader = LineReader.init(in);
-    var buffer: [1024]u8 = undefined;
-    while (try reader.readLine(&buffer)) |line| {
-        var iter = std.mem.splitSequence(u8, line, "   ");
-        const x = try std.fmt.parseInt(i64, iter.next().?, 10);
-        try xs.append(x);
-        const y = try std.fmt.parseInt(i64, iter.next().?, 10);
-        try ys.append(y);
-    }
+    var xs = common.array(u64, n);
+    var ys = common.array(u64, n);
 
-    std.mem.sort(i64, xs.items, {}, comptime std.sort.asc(i64));
-    std.mem.sort(i64, ys.items, {}, comptime std.sort.asc(i64));
+    try parseIn(in, n, &xs, &ys);
 
-    std.debug.assert(xs.items.len == ys.items.len);
+    std.mem.sort(u64, &xs, {}, std.sort.asc(u64));
+    std.mem.sort(u64, &ys, {}, std.sort.asc(u64));
 
-    var answer: u64 = 0;
-    for (xs.items, ys.items) |x, y| {
-        answer += @abs(x - y);
+    var answer = 0;
+    for (xs, ys) |x, y| {
+        if (x > y) {
+            answer += x - y;
+        } else {
+            answer += y - x;
+        }
     }
     return answer;
 }
 
-pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
-    var xs = std.ArrayList(u64).init(allocator);
-    defer xs.deinit();
-    var ys = std.AutoHashMap(u64, u64).init(allocator);
-    defer ys.deinit();
+pub fn @"2"(in: []const u8) common.Error!u64 {
+    const n = common.countLines(in);
 
-    var reader = LineReader.init(in);
-    var buffer: [1024]u8 = undefined;
-    while (try reader.readLine(&buffer)) |line| {
-        var iter = std.mem.splitSequence(u8, line, "   ");
-        const x = try std.fmt.parseInt(u64, iter.next().?, 10);
-        try xs.append(x);
-        const y = try std.fmt.parseInt(u64, iter.next().?, 10);
-        const count = ys.get(y) orelse 0;
-        try ys.put(y, count + 1);
+    var xs = common.array(u64, n);
+    var ys = common.array(u64, n);
+
+    try parseIn(in, n, &xs, &ys);
+
+    var max = 0;
+    for (ys) |y| {
+        if (y > max) {
+            max = y;
+        }
+    }
+    var counts = common.array(u64, max + 1);
+    for (0..n) |i| {
+        const y = ys[i];
+        counts[y] += 1;
     }
 
-    var answer: u64 = 0;
-    for (xs.items) |x| {
-        const count = ys.get(x) orelse 0;
+    var answer = 0;
+    for (0..n) |i| {
+        const x = xs[i];
+        const count = counts[x];
         answer += x * count;
     }
     return answer;
 }
 
+fn parseIn(s: []const u8, n: usize, xs: []u64, ys: []u64) common.Error!void {
+    var position = 0;
+    for (0..n) |i| {
+        const x = try common.parseNumber(s, position);
+        xs[i] = x.value;
+        position = try common.parseIdentifier(s, x.position, "   ");
+        const y = try common.parseNumber(s, position);
+        ys[i] = y.value;
+        position = try common.parseIdentifier(s, y.position, "\n");
+    }
+}
+
 test {
     const in = @embedFile("in_test.txt");
-    const allocator = std.testing.allocator;
 
-    try std.testing.expectEqual(11, try @"1"(allocator, in));
-    try std.testing.expectEqual(31, try @"2"(allocator, in));
+    comptime {
+        try std.testing.expectEqual(11, try @"1"(in));
+        try std.testing.expectEqual(31, try @"2"(in));
+    }
 }
