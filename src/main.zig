@@ -30,8 +30,8 @@ pub fn main() !void {
     try switch (task_n) {
         1 => solveAlloc(allocator, task_01, in_01),
         2 => solveAlloc(allocator, task_02, in_02),
-        3 => solveComptime(task_03, in_03),
-        4 => solveComptime(task_04, in_04),
+        3 => solve(task_03, in_03), // may solve in comptime
+        4 => solve(task_04, in_04), // may solve in comptime
         else => unreachable,
     };
 }
