@@ -2,7 +2,7 @@ const std = @import("std");
 
 const LineReader = @import("../utils.zig").LineReader;
 
-pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) !u64 {
+pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
     var answer: u64 = 0;
     var reader = LineReader.init(in);
     var buffer: [1024]u8 = undefined;
@@ -21,7 +21,7 @@ pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) !u64 {
     return answer;
 }
 
-pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) !u64 {
+pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
     var answer: u64 = 0;
     var reader = LineReader.init(in);
     var buffer: [1024]u8 = undefined;
@@ -59,7 +59,7 @@ fn checkBounds(xs: []const i64, lower: i64, upper: i64) bool {
     return true;
 }
 
-fn check(allocator: std.mem.Allocator, xs: []const i64) !bool {
+fn check(allocator: std.mem.Allocator, xs: []const i64) anyerror!bool {
     std.debug.assert(xs.len > 0);
 
     var z = xs[0];

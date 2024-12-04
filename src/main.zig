@@ -28,22 +28,33 @@ pub fn main() !void {
         10,
     );
     try switch (task_n) {
-        1 => solve(allocator, task_01, in_01),
-        2 => solve(allocator, task_02, in_02),
-        3 => solve(allocator, task_03, in_03),
-        4 => solve(allocator, task_04, in_04),
+        1 => solveAlloc(allocator, task_01, in_01),
+        2 => solveAlloc(allocator, task_02, in_02),
+        3 => solveComptime(task_03, in_03),
+        4 => solveComptime(task_04, in_04),
         else => unreachable,
     };
 }
 
-fn solve(allocator: std.mem.Allocator, comptime task: anytype, in: []const u8) !void {
+fn solve(comptime task: anytype, in: []const u8) !void {
+    print(1, try task.@"1"(in));
+    print(2, try task.@"2"(in));
+}
+
+fn solveAlloc(allocator: std.mem.Allocator, comptime task: anytype, in: []const u8) !void {
     print(1, try task.@"1"(allocator, in));
     print(2, try task.@"2"(allocator, in));
 }
 
-fn print(comptime n: comptime_int, answer: anytype) void {
+fn solveComptime(comptime task: anytype, comptime in: []const u8) !void {
+    @setEvalBranchQuota(1_000_000);
+    print(1, comptime try task.@"1"(in));
+    print(2, comptime try task.@"2"(in));
+}
+
+fn print(comptime n: comptime_int, answer: u64) void {
     std.debug.print(
-        "Answer {d}: {any}\n",
+        "Answer {d}: {d}\n",
         .{
             .n = n,
             .answer = answer,

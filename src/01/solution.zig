@@ -2,7 +2,7 @@ const std = @import("std");
 
 const LineReader = @import("../utils.zig").LineReader;
 
-pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) !u64 {
+pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
     var xs = std.ArrayList(i64).init(allocator);
     defer xs.deinit();
     var ys = std.ArrayList(i64).init(allocator);
@@ -30,7 +30,7 @@ pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) !u64 {
     return answer;
 }
 
-pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) !u64 {
+pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
     var xs = std.ArrayList(u64).init(allocator);
     defer xs.deinit();
     var ys = std.AutoHashMap(u64, u64).init(allocator);

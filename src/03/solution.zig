@@ -1,5 +1,5 @@
-pub fn @"1"(_: std.mem.Allocator, in: []const u8) anyerror!i64 {
-    var answer: i64 = 0;
+pub fn @"1"(in: []const u8) Error!u64 {
+    var answer: u64 = 0;
     var position: usize = 0;
     while (true) {
         if (position >= in.len) {
@@ -15,8 +15,8 @@ pub fn @"1"(_: std.mem.Allocator, in: []const u8) anyerror!i64 {
     return answer;
 }
 
-pub fn @"2"(_: std.mem.Allocator, in: []const u8) anyerror!i64 {
-    var answer: i64 = 0;
+pub fn @"2"(in: []const u8) Error!u64 {
+    var answer: u64 = 0;
     var enabled = true;
     var position: usize = 0;
     while (true) {
@@ -66,8 +66,8 @@ fn parseIdentifier(s: []const u8, position: usize, id: []const u8) Error!usize {
     return position + id.len;
 }
 
-fn parseNumber(s: []const u8, position: usize) Error!Parsed(i64) {
-    var n: i64 = 0;
+fn parseNumber(s: []const u8, position: usize) Error!Parsed(u64) {
+    var n: u64 = 0;
     for (0.., s[position..]) |i, c| {
         if (c >= '0' and c <= '9') {
             n *= 10;
@@ -85,7 +85,7 @@ fn parseNumber(s: []const u8, position: usize) Error!Parsed(i64) {
     return Error.NoParse;
 }
 
-fn parseOperation(s: []const u8, iposition: usize) Error!Parsed(i64) {
+fn parseOperation(s: []const u8, iposition: usize) Error!Parsed(u64) {
     var position = iposition;
     position = try parseIdentifier(s, position, "mul(");
     const x = try parseNumber(s, position);
@@ -104,18 +104,14 @@ const std = @import("std");
 
 test "1" {
     const in = @embedFile("in_test_01.txt");
-    const allocator = std.testing.allocator;
-
     comptime {
-        try std.testing.expectEqual(161, try @"1"(allocator, in));
+        try std.testing.expectEqual(161, try @"1"(in));
     }
 }
 
 test "2" {
     const in = @embedFile("in_test_02.txt");
-    const allocator = std.testing.allocator;
-
     comptime {
-        try std.testing.expectEqual(48, try @"2"(allocator, in));
+        try std.testing.expectEqual(48, try @"2"(in));
     }
 }
