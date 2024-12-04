@@ -139,6 +139,9 @@ test {
     const in = @embedFile("in_test.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expectEqual(18, try @"1"(allocator, in));
-    try std.testing.expectEqual(9, try @"2"(allocator, in));
+    comptime {
+        @setEvalBranchQuota(10000);
+        try std.testing.expectEqual(18, try @"1"(allocator, in));
+        try std.testing.expectEqual(9, try @"2"(allocator, in));
+    }
 }

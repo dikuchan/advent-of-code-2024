@@ -106,12 +106,16 @@ test "1" {
     const in = @embedFile("in_test_01.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expectEqual(161, try @"1"(allocator, in));
+    comptime {
+        try std.testing.expectEqual(161, try @"1"(allocator, in));
+    }
 }
 
 test "2" {
     const in = @embedFile("in_test_02.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expectEqual(48, try @"2"(allocator, in));
+    comptime {
+        try std.testing.expectEqual(48, try @"2"(allocator, in));
+    }
 }
