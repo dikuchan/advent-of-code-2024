@@ -1,8 +1,6 @@
-const std = @import("std");
-
 const Error = error{};
 
-pub fn @"1"(in: []const u8, _: std.mem.Allocator) Error!u64 {
+pub fn @"1"(_: std.mem.Allocator, in: []const u8) Error!u64 {
     var answer: u64 = 0;
     const directions = [_]Direction{
         .@"0",
@@ -27,7 +25,7 @@ pub fn @"1"(in: []const u8, _: std.mem.Allocator) Error!u64 {
     return answer;
 }
 
-pub fn @"2"(in: []const u8, _: std.mem.Allocator) Error!u64 {
+pub fn @"2"(_: std.mem.Allocator, in: []const u8) Error!u64 {
     var answer: u64 = 0;
     const board = Board.init(in);
     for (0..board.X) |x| {
@@ -135,10 +133,12 @@ fn findMAS(
     return false;
 }
 
+const std = @import("std");
+
 test {
     const in = @embedFile("in_test.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expectEqual(18, try @"1"(in, allocator));
-    try std.testing.expectEqual(9, try @"2"(in, allocator));
+    try std.testing.expectEqual(18, try @"1"(allocator, in));
+    try std.testing.expectEqual(9, try @"2"(allocator, in));
 }

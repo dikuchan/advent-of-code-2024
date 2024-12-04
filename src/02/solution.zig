@@ -2,7 +2,7 @@ const std = @import("std");
 
 const LineReader = @import("../utils.zig").LineReader;
 
-pub fn @"1"(in: []const u8, allocator: std.mem.Allocator) !u64 {
+pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) !u64 {
     var answer: u64 = 0;
     var reader = LineReader.init(in);
     var buffer: [1024]u8 = undefined;
@@ -21,7 +21,7 @@ pub fn @"1"(in: []const u8, allocator: std.mem.Allocator) !u64 {
     return answer;
 }
 
-pub fn @"2"(in: []const u8, allocator: std.mem.Allocator) !u64 {
+pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) !u64 {
     var answer: u64 = 0;
     var reader = LineReader.init(in);
     var buffer: [1024]u8 = undefined;
@@ -50,7 +50,7 @@ pub fn @"2"(in: []const u8, allocator: std.mem.Allocator) !u64 {
     return answer;
 }
 
-fn check_bounds(xs: []const i64, lower: i64, upper: i64) bool {
+fn checkBounds(xs: []const i64, lower: i64, upper: i64) bool {
     for (xs) |x| {
         if (x < lower or x > upper) {
             return false;
@@ -71,10 +71,10 @@ fn check(allocator: std.mem.Allocator, xs: []const i64) !bool {
         z = x;
     }
 
-    if (check_bounds(deltas.items, 1, 3)) {
+    if (checkBounds(deltas.items, 1, 3)) {
         return true;
     }
-    if (check_bounds(deltas.items, -3, -1)) {
+    if (checkBounds(deltas.items, -3, -1)) {
         return true;
     }
     return false;
@@ -84,6 +84,6 @@ test {
     const in = @embedFile("in_test.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expect(try @"1"(in, allocator) == 2);
-    try std.testing.expect(try @"2"(in, allocator) == 4);
+    try std.testing.expectEqual(2, try @"1"(allocator, in));
+    try std.testing.expectEqual(4, try @"2"(allocator, in));
 }

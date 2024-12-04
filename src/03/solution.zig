@@ -1,6 +1,4 @@
-const std = @import("std");
-
-pub fn @"1"(in: []const u8, _: std.mem.Allocator) anyerror!i64 {
+pub fn @"1"(_: std.mem.Allocator, in: []const u8) anyerror!i64 {
     var answer: i64 = 0;
     var position: usize = 0;
     while (true) {
@@ -17,7 +15,7 @@ pub fn @"1"(in: []const u8, _: std.mem.Allocator) anyerror!i64 {
     return answer;
 }
 
-pub fn @"2"(in: []const u8, _: std.mem.Allocator) anyerror!i64 {
+pub fn @"2"(_: std.mem.Allocator, in: []const u8) anyerror!i64 {
     var answer: i64 = 0;
     var enabled = true;
     var position: usize = 0;
@@ -102,16 +100,18 @@ fn parseOperation(s: []const u8, iposition: usize) Error!Parsed(i64) {
     };
 }
 
+const std = @import("std");
+
 test "1" {
     const in = @embedFile("in_test_01.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expect(try @"1"(in, allocator) == 161);
+    try std.testing.expectEqual(161, try @"1"(allocator, in));
 }
 
 test "2" {
     const in = @embedFile("in_test_02.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expect(try @"2"(in, allocator) == 48);
+    try std.testing.expectEqual(48, try @"2"(allocator, in));
 }

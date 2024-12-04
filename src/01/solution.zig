@@ -2,7 +2,7 @@ const std = @import("std");
 
 const LineReader = @import("../utils.zig").LineReader;
 
-pub fn @"1"(in: []const u8, allocator: std.mem.Allocator) !u64 {
+pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) !u64 {
     var xs = std.ArrayList(i64).init(allocator);
     defer xs.deinit();
     var ys = std.ArrayList(i64).init(allocator);
@@ -30,7 +30,7 @@ pub fn @"1"(in: []const u8, allocator: std.mem.Allocator) !u64 {
     return answer;
 }
 
-pub fn @"2"(in: []const u8, allocator: std.mem.Allocator) !u64 {
+pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) !u64 {
     var xs = std.ArrayList(u64).init(allocator);
     defer xs.deinit();
     var ys = std.AutoHashMap(u64, u64).init(allocator);
@@ -59,6 +59,6 @@ test {
     const in = @embedFile("in_test.txt");
     const allocator = std.testing.allocator;
 
-    try std.testing.expect(try @"1"(in, allocator) == 11);
-    try std.testing.expect(try @"2"(in, allocator) == 31);
+    try std.testing.expectEqual(11, try @"1"(allocator, in));
+    try std.testing.expectEqual(31, try @"2"(allocator, in));
 }

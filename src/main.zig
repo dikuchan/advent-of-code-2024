@@ -28,25 +28,25 @@ pub fn main() !void {
         10,
     );
     try switch (task_n) {
-        1 => solve(task_01, in_01, allocator),
-        2 => solve(task_02, in_02, allocator),
-        3 => solve(task_03, in_03, allocator),
-        4 => solve(task_04, in_04, allocator),
+        1 => solve(allocator, task_01, in_01),
+        2 => solve(allocator, task_02, in_02),
+        3 => solve(allocator, task_03, in_03),
+        4 => solve(allocator, task_04, in_04),
         else => unreachable,
     };
 }
 
-fn solve(comptime task: anytype, in: []const u8, allocator: std.mem.Allocator) !void {
+fn solve(allocator: std.mem.Allocator, comptime task: anytype, in: []const u8) !void {
+    print(1, try task.@"1"(allocator, in));
+    print(2, try task.@"2"(allocator, in));
+}
+
+fn print(comptime n: comptime_int, answer: anytype) void {
     std.debug.print(
-        "Answer 1: {d}\n",
+        "Answer {d}: {any}\n",
         .{
-            .answer = try task.@"1"(in, allocator),
-        },
-    );
-    std.debug.print(
-        "Answer 2: {d}\n",
-        .{
-            .answer = try task.@"2"(in, allocator),
+            .n = n,
+            .answer = answer,
         },
     );
 }
