@@ -5,8 +5,8 @@ const common = @import("../common.zig");
 pub fn @"1"(in: []const u8) common.Error!u64 {
     const n = common.countLines(in);
 
-    var xs = common.array(u64, n);
-    var ys = common.array(u64, n);
+    var xs = common.array(u64, n, 0);
+    var ys = common.array(u64, n, 0);
 
     try parseIn(in, n, &xs, &ys);
 
@@ -27,8 +27,8 @@ pub fn @"1"(in: []const u8) common.Error!u64 {
 pub fn @"2"(in: []const u8) common.Error!u64 {
     const n = common.countLines(in);
 
-    var xs = common.array(u64, n);
-    var ys = common.array(u64, n);
+    var xs = common.array(u64, n, 0);
+    var ys = common.array(u64, n, 0);
 
     try parseIn(in, n, &xs, &ys);
 
@@ -38,7 +38,7 @@ pub fn @"2"(in: []const u8) common.Error!u64 {
             max = y;
         }
     }
-    var counts = common.array(u64, max + 1);
+    var counts = common.array(u64, max + 1, 0);
     for (ys) |y| {
         counts[y] += 1;
     }
