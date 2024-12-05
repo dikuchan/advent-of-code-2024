@@ -25,6 +25,14 @@ pub const Parser = struct {
         return p.src[p.pos];
     }
 
+    pub fn eof(p: Parser) bool {
+        if (p.peek()) |c| {
+            return c == '\n';
+        } else {
+            return true;
+        }
+    }
+
     pub fn seek(p: *Parser, i: usize) void {
         std.debug.assert(i <= p.pos);
         p.pos = i;
@@ -86,5 +94,28 @@ pub const Parser = struct {
             }
         }
         return Error.NoParse;
+    }
+
+    pub fn getNumberLineLen(p: *Parser, delimiter: []const u8) Error!usize {
+        const begin = p.pos;
+        defer p.seek(begin);
+        var n: usize = 0;
+        while (p.peek() != '\n') {
+            _ = try p.parseNumber();
+            n += 1;
+            p.parseString(delimiter) catch break;
+        }
+        try p.parseChar('\n');
+        return n;
+    }
+
+    pub fn parseNumberLine(p: *Parser, xs: []u64, delimiter: []const u8) Error!void {
+        const begin = p.pos;
+        errdefer p.seek(begin);
+        for (0..xs.len) |i| {
+            xs[i] = try p.parseNumber();
+            p.parseString(delimiter) catch break;
+        }
+        try p.parseChar('\n');
     }
 };

@@ -1,47 +1,37 @@
 const std = @import("std");
 
-const LineReader = @import("../common.zig").LineReader;
+const Parser = @import("../parser.zig").Parser;
 
-pub fn @"1"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
+pub fn @"1"(in: []const u8) !u64 {
+    var parser = Parser.init(in);
     var answer: u64 = 0;
-    var reader = LineReader.init(in);
-    var buffer: [1024]u8 = undefined;
-    while (try reader.readLine(&buffer)) |line| {
-        var iter = std.mem.splitSequence(u8, line, " ");
-        var xs = std.ArrayList(i64).init(allocator);
-        defer xs.deinit();
-        while (iter.next()) |s| {
-            const x = try std.fmt.parseInt(i64, s, 10);
-            try xs.append(x);
-        }
-        if (try check(allocator, xs.items)) {
+    while (!parser.eof()) {
+        var xs = [_]u64{0} ** try parser.getNumberLineLen(" ");
+        parser.parseNumberLine(&xs, " ") catch break;
+        if (check(&xs)) {
             answer += 1;
         }
     }
     return answer;
 }
 
-pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
+pub fn @"2"(in: []const u8) !u64 {
+    var parser = Parser.init(in);
     var answer: u64 = 0;
-    var reader = LineReader.init(in);
-    var buffer: [1024]u8 = undefined;
-    while (try reader.readLine(&buffer)) |line| {
-        var iter = std.mem.splitSequence(u8, line, " ");
-        var xs = std.ArrayList(i64).init(allocator);
-        defer xs.deinit();
-        while (iter.next()) |s| {
-            const x = try std.fmt.parseInt(i64, s, 10);
-            try xs.append(x);
-        }
-        for (0..xs.items.len) |i| {
-            var ys = std.ArrayList(i64).init(allocator);
-            defer ys.deinit();
-            for (0.., xs.items) |j, x| {
+    while (!parser.eof()) {
+        const n = try parser.getNumberLineLen(" ");
+        var xs = [_]u64{0} ** n;
+        parser.parseNumberLine(&xs, " ") catch break;
+        for (0..n) |i| {
+            var ys = [_]u64{0} ** (n - 1);
+            var k: usize = 0;
+            for (0..n) |j| {
                 if (i != j) {
-                    try ys.append(x);
+                    ys[k] = xs[j];
+                    k += 1;
                 }
             }
-            if (try check(allocator, ys.items)) {
+            if (check(&ys)) {
                 answer += 1;
                 break;
             }
@@ -50,40 +40,37 @@ pub fn @"2"(allocator: std.mem.Allocator, in: []const u8) anyerror!u64 {
     return answer;
 }
 
-fn checkBounds(xs: []const i64, lower: i64, upper: i64) bool {
-    for (xs) |x| {
-        if (x < lower or x > upper) {
+fn check(xs: []u64) bool {
+    var ds = [_]i64{0} ** (xs.len - 1);
+    for (0..xs.len - 1) |i| {
+        const ai: i64 = @intCast(xs[i]);
+        const bi: i64 = @intCast(xs[i + 1]);
+        ds[i] = bi - ai;
+    }
+    if (checkBounds(&ds, 1, 3)) {
+        return true;
+    }
+    if (checkBounds(&ds, -3, -1)) {
+        return true;
+    }
+    return false;
+}
+
+fn checkBounds(ds: []const i64, lower: i64, upper: i64) bool {
+    for (ds) |d| {
+        if (d < lower or d > upper) {
             return false;
         }
     }
     return true;
 }
 
-fn check(allocator: std.mem.Allocator, xs: []const i64) anyerror!bool {
-    std.debug.assert(xs.len > 0);
-
-    var z = xs[0];
-    var deltas = std.ArrayList(i64).init(allocator);
-    defer deltas.deinit();
-
-    for (xs[1..]) |x| {
-        try deltas.append(x - z);
-        z = x;
-    }
-
-    if (checkBounds(deltas.items, 1, 3)) {
-        return true;
-    }
-    if (checkBounds(deltas.items, -3, -1)) {
-        return true;
-    }
-    return false;
-}
-
 test {
     const in = @embedFile("in_test.txt");
-    const allocator = std.testing.allocator;
 
-    try std.testing.expectEqual(2, try @"1"(allocator, in));
-    try std.testing.expectEqual(4, try @"2"(allocator, in));
+    comptime {
+        @setEvalBranchQuota(100_000);
+        try std.testing.expectEqual(2, try @"1"(in));
+        try std.testing.expectEqual(4, try @"2"(in));
+    }
 }

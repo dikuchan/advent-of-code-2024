@@ -6,6 +6,7 @@ pub fn main() !void {
     comptime {
         const answer = try switch (task_n) {
             1 => solve(@import("./01/solution.zig")),
+            2 => solve(@import("./02/solution.zig")),
             3 => solve(@import("./03/solution.zig")),
             4 => solve(@import("./04/solution.zig")),
             5 => solve(@import("./05/solution.zig")),
