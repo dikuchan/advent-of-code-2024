@@ -17,12 +17,6 @@ pub fn build(b: *std.Build) void {
 
     b.installArtifact(exe);
 
-    const run_exe = b.addRunArtifact(exe);
-    run_exe.step.dependOn(b.getInstallStep());
-
-    const run_step = b.step("run", "Run application");
-    run_step.dependOn(&run_exe.step);
-
     const tests = b.addTest(.{
         .root_source_file = b.path("src/tests.zig"),
         .target = b.host,
