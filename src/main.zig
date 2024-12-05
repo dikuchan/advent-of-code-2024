@@ -13,10 +13,10 @@ pub fn main() !void {
             else => @compileError("no such task"),
         };
         @compileLog(
-            std.fmt.comptimePrint("1: {d}", .{answer.@"1"}),
+            std.fmt.comptimePrint("Answer 1: {d}", .{answer.@"1"}),
         );
         @compileLog(
-            std.fmt.comptimePrint("2: {d}", .{answer.@"2"}),
+            std.fmt.comptimePrint("Answer 2: {d}", .{answer.@"2"}),
         );
     }
 }
