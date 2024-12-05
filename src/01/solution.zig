@@ -1,6 +1,5 @@
 const std = @import("std");
 
-const common = @import("../common.zig");
 const Parser = @import("../parser.zig").Parser;
 
 pub fn @"1"(in: []const u8) !u64 {
@@ -8,8 +7,8 @@ pub fn @"1"(in: []const u8) !u64 {
 
     const n = count(&parser, '\n');
 
-    var xs = common.array(u64, n, 0);
-    var ys = common.array(u64, n, 0);
+    var xs = [_]u64{0} ** n;
+    var ys = [_]u64{0} ** n;
 
     try parse(&parser, n, &xs, &ys);
 
@@ -32,8 +31,8 @@ pub fn @"2"(in: []const u8) !u64 {
 
     const n = count(&parser, '\n');
 
-    var xs = common.array(u64, n, 0);
-    var ys = common.array(u64, n, 0);
+    var xs = [_]u64{0} ** n;
+    var ys = [_]u64{0} ** n;
 
     try parse(&parser, n, &xs, &ys);
 
@@ -43,7 +42,7 @@ pub fn @"2"(in: []const u8) !u64 {
             z = y;
         }
     }
-    var cs = common.array(u64, z + 1, 0);
+    var cs = [_]u64{0} ** (z + 1);
     for (ys) |y| {
         cs[y] += 1;
     }
@@ -66,11 +65,10 @@ fn parse(parser: *Parser, n: usize, xs: []u64, ys: []u64) !void {
 
 fn count(parser: *Parser, c: u8) usize {
     var n: usize = 0;
-    while (parser.peek()) |e| {
+    while (parser.next()) |e| {
         if (e == c) {
             n += 1;
         }
-        parser.skip();
     }
     parser.seek(0);
     return n;

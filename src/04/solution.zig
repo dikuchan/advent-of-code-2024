@@ -1,8 +1,6 @@
 const std = @import("std");
 
-const Error = error{};
-
-pub fn @"1"(in: []const u8) Error!u64 {
+pub fn @"1"(in: []const u8) !u64 {
     var answer: u64 = 0;
     const directions = [_]Direction{
         .@"0",
@@ -27,7 +25,7 @@ pub fn @"1"(in: []const u8) Error!u64 {
     return answer;
 }
 
-pub fn @"2"(in: []const u8) Error!u64 {
+pub fn @"2"(in: []const u8) !u64 {
     var answer: u64 = 0;
     const board = Board.init(in);
     for (0..board.X) |x| {

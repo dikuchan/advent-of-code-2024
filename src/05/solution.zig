@@ -1,6 +1,5 @@
 const std = @import("std");
 
-const common = @import("../common.zig");
 const Parser = @import("../parser.zig").Parser;
 
 const N = 100;
@@ -28,8 +27,9 @@ fn @"12"(in: []const u8, checker: fn ([]u64, Map) u64) !u64 {
         }
         parser.skip();
     }
-    var lowers = common.array(u64, rn, 0);
-    var uppers = common.array(u64, rn, 0);
+
+    var lowers = [_]u64{0} ** rn;
+    var uppers = [_]u64{0} ** rn;
 
     parser.seek(0);
 
@@ -51,38 +51,33 @@ fn @"12"(in: []const u8, checker: fn ([]u64, Map) u64) !u64 {
     }
 
     var answer: u64 = 0;
-    outer: while (parser.peek() != '\n') {
-        var upd = common.array(u64, 32, 0);
-        var i: usize = 0;
-        while (parser.peek() != '\n') : (i += 1) {
-            upd[i] = parser.parseNumber() catch break :outer;
-            parser.parseChar(',') catch break;
-        }
-        answer += checker(upd[0 .. i + 1], rd);
-        try parser.parseChar('\n');
+    while (!parser.eof()) {
+        var xs = [_]u64{0} ** try parser.getNumberLineLen(",");
+        parser.parseNumberLine(&xs, ",") catch break;
+        answer += checker(&xs, rd);
     }
     return answer;
 }
 
-fn check(upd: []const u64, rd: Map) u64 {
-    for (0.., upd) |i, upper| {
+fn check(xs: []const u64, rd: Map) u64 {
+    for (0.., xs) |i, upper| {
         const r = rd[upper];
         for (0..i) |j| {
-            const lower = upd[j];
+            const lower = xs[j];
             if (!r[lower]) {
                 return 0;
             }
         }
     }
-    return upd[@divFloor(upd.len, 2)];
+    return xs[@divFloor(xs.len, 2)];
 }
 
-fn checkOrFix(upd: []u64, rd: Map) u64 {
-    if (check(upd, rd) != 0) {
+fn checkOrFix(xs: []u64, rd: Map) u64 {
+    if (check(xs, rd) != 0) {
         return 0;
     }
-    std.mem.sort(u64, upd, rd, compare);
-    return upd[@divFloor(upd.len, 2)];
+    std.mem.sort(u64, xs, rd, compare);
+    return xs[@divFloor(xs.len, 2)];
 }
 
 pub fn compare(rd: Map, a: u64, b: u64) bool {

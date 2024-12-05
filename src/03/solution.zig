@@ -1,6 +1,5 @@
 const std = @import("std");
 
-const common = @import("../common.zig");
 const Parser = @import("../parser.zig").Parser;
 
 pub fn @"1"(in: []const u8) !u64 {
