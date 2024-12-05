@@ -1,14 +1,17 @@
 const std = @import("std");
 
 const common = @import("../common.zig");
+const Parser = @import("../parser.zig").Parser;
 
-pub fn @"1"(in: []const u8) common.Error!u64 {
-    const n = common.countLines(in);
+pub fn @"1"(in: []const u8) !u64 {
+    var parser = Parser.init(in);
+
+    const n = count(&parser, '\n');
 
     var xs = common.array(u64, n, 0);
     var ys = common.array(u64, n, 0);
 
-    try parseIn(in, n, &xs, &ys);
+    try parse(&parser, n, &xs, &ys);
 
     std.mem.sort(u64, &xs, {}, std.sort.asc(u64));
     std.mem.sort(u64, &ys, {}, std.sort.asc(u64));
@@ -24,43 +27,53 @@ pub fn @"1"(in: []const u8) common.Error!u64 {
     return answer;
 }
 
-pub fn @"2"(in: []const u8) common.Error!u64 {
-    const n = common.countLines(in);
+pub fn @"2"(in: []const u8) !u64 {
+    var parser = Parser.init(in);
+
+    const n = count(&parser, '\n');
 
     var xs = common.array(u64, n, 0);
     var ys = common.array(u64, n, 0);
 
-    try parseIn(in, n, &xs, &ys);
+    try parse(&parser, n, &xs, &ys);
 
-    var max = 0;
+    var z = 0;
     for (ys) |y| {
-        if (y > max) {
-            max = y;
+        if (y > z) {
+            z = y;
         }
     }
-    var counts = common.array(u64, max + 1, 0);
+    var cs = common.array(u64, z + 1, 0);
     for (ys) |y| {
-        counts[y] += 1;
+        cs[y] += 1;
     }
 
     var answer = 0;
     for (xs) |x| {
-        const count = counts[x];
-        answer += x * count;
+        answer += x * cs[x];
     }
     return answer;
 }
 
-fn parseIn(s: []const u8, n: usize, xs: []u64, ys: []u64) common.Error!void {
-    var position = 0;
+fn parse(parser: *Parser, n: usize, xs: []u64, ys: []u64) !void {
     for (0..n) |i| {
-        const x = try common.parseNumber(s, position);
-        xs[i] = x.value;
-        position = try common.parseIdentifier(s, x.position, "   ");
-        const y = try common.parseNumber(s, position);
-        ys[i] = y.value;
-        position = try common.parseIdentifier(s, y.position, "\n");
+        xs[i] = try parser.parseNumber();
+        try parser.parseString("   ");
+        ys[i] = try parser.parseNumber();
+        try parser.parseChar('\n');
     }
+}
+
+fn count(parser: *Parser, c: u8) usize {
+    var n: usize = 0;
+    while (parser.peek()) |e| {
+        if (e == c) {
+            n += 1;
+        }
+        parser.skip();
+    }
+    parser.seek(0);
+    return n;
 }
 
 test {

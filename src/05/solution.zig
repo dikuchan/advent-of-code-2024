@@ -1,22 +1,21 @@
 const std = @import("std");
 
 const common = @import("../common.zig");
-const Parser = common.Parser;
-const ParseError = common.ParseError;
+const Parser = @import("../parser.zig").Parser;
 
 const N = 100;
 
 const Map = [N][N]bool;
 
-pub fn @"1"(in: []const u8) ParseError!u64 {
+pub fn @"1"(in: []const u8) !u64 {
     return @"12"(in, check);
 }
 
-pub fn @"2"(in: []const u8) ParseError!u64 {
+pub fn @"2"(in: []const u8) !u64 {
     return @"12"(in, checkOrFix);
 }
 
-pub fn @"12"(in: []const u8, checker: fn ([]u64, Map) u64) ParseError!u64 {
+fn @"12"(in: []const u8, checker: fn ([]u64, Map) u64) !u64 {
     var parser = Parser.init(in);
 
     var rn: usize = 0;
@@ -32,7 +31,7 @@ pub fn @"12"(in: []const u8, checker: fn ([]u64, Map) u64) ParseError!u64 {
     var lowers = common.array(u64, rn, 0);
     var uppers = common.array(u64, rn, 0);
 
-    try parser.seek(0);
+    parser.seek(0);
 
     for (0..rn) |i| {
         lowers[i] = try parser.parseNumber();
@@ -82,12 +81,7 @@ fn checkOrFix(upd: []u64, rd: Map) u64 {
     if (check(upd, rd) != 0) {
         return 0;
     }
-    std.mem.sort(
-        u64,
-        upd,
-        rd,
-        compare,
-    );
+    std.mem.sort(u64, upd, rd, compare);
     return upd[@divFloor(upd.len, 2)];
 }
 
