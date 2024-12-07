@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const Parser = @import("../parser.zig").Parser;
+const Parser = @import("../Parser.zig");
 
 pub fn @"1"(in: []const u8) !u64 {
     var parser = Parser.init(in);
