@@ -11,6 +11,7 @@ pub fn main() !void {
             4 => solve(@import("./04/solution.zig")),
             5 => solve(@import("./05/solution.zig")),
             6 => solve(@import("./06/solution.zig")),
+            7 => solve(@import("./07/solution.zig")),
             else => @compileError("no such task"),
         };
         @compileLog(
@@ -28,7 +29,7 @@ const Answer = struct {
 };
 
 fn solve(comptime task: anytype) !Answer {
-    @setEvalBranchQuota(100_000_000);
+    @setEvalBranchQuota(1_000_000_000);
 
     const in = @embedFile(std.fmt.comptimePrint("./{d:0>2}/in.txt", .{task_n}));
     return Answer{
