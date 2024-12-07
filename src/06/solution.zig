@@ -80,7 +80,7 @@ const Guard = struct {
     y: isize,
     direction: Directon,
 
-    fn goForward(self: *Self) void {
+    fn stepForward(self: *Self) void {
         switch (self.direction) {
             .left => self.x -= 1,
             .up => self.y -= 1,
@@ -89,7 +89,7 @@ const Guard = struct {
         }
     }
 
-    fn goBack(self: *Self) void {
+    fn stepBack(self: *Self) void {
         switch (self.direction) {
             .left => self.x += 1,
             .up => self.y += 1,
@@ -108,10 +108,10 @@ const Guard = struct {
     }
 
     fn step(self: *Self, grid: Grid, ex: isize, ey: isize) bool {
-        self.goForward();
+        self.stepForward();
         if (grid.get(self.x, self.y)) |c| {
             if (c == obstacle or (self.x == ex and self.y == ey)) {
-                self.goBack();
+                self.stepBack();
                 self.rotate();
             }
             return true;

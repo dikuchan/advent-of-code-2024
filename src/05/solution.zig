@@ -81,10 +81,7 @@ fn checkOrFix(xs: []u64, rd: Map) u64 {
 }
 
 pub fn compare(rd: Map, a: u64, b: u64) bool {
-    if (rd[a][b]) {
-        return true;
-    }
-    return false;
+    return rd[a][b];
 }
 
 test {

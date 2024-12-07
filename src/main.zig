@@ -4,7 +4,7 @@ const task_n = @import("options").task_n;
 
 pub fn main() !void {
     comptime {
-        const answer = try switch (task_n) {
+        const answer = switch (task_n) {
             1 => solve(@import("./01/solution.zig")),
             2 => solve(@import("./02/solution.zig")),
             3 => solve(@import("./03/solution.zig")),
@@ -28,12 +28,12 @@ const Answer = struct {
     @"2": u64,
 };
 
-fn solve(comptime task: anytype) !Answer {
+fn solve(comptime task: anytype) Answer {
     @setEvalBranchQuota(1_000_000_000);
 
     const in = @embedFile(std.fmt.comptimePrint("./{d:0>2}/in.txt", .{task_n}));
-    return Answer{
-        .@"1" = try task.@"1"(in),
-        .@"2" = try task.@"2"(in),
+    return .{
+        .@"1" = task.@"1"(in) catch unreachable,
+        .@"2" = task.@"2"(in) catch unreachable,
     };
 }
