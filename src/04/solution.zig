@@ -1,5 +1,7 @@
 const std = @import("std");
 
+const Grid = @import("../Grid.zig");
+
 pub fn @"1"(in: []const u8) !u64 {
     var answer: u64 = 0;
     const directions = [_]Direction{
@@ -12,11 +14,11 @@ pub fn @"1"(in: []const u8) !u64 {
         .@"270",
         .@"315",
     };
-    const board = Board.init(in);
-    for (0..board.X) |x| {
-        for (0..board.Y) |y| {
+    const grid = Grid.init(in);
+    for (0..grid.X) |x| {
+        for (0..grid.Y) |y| {
             for (directions) |direction| {
-                if (find(board, x, y, "XMAS", direction)) {
+                if (find(grid, x, y, "XMAS", direction)) {
                     answer += 1;
                 }
             }
@@ -27,52 +29,16 @@ pub fn @"1"(in: []const u8) !u64 {
 
 pub fn @"2"(in: []const u8) !u64 {
     var answer: u64 = 0;
-    const board = Board.init(in);
-    for (0..board.X) |x| {
-        for (0..board.Y) |y| {
-            if (findMAS(board, x, y, .@"135", .@"315") and findMAS(board, x, y, .@"45", .@"225")) {
+    const grid = Grid.init(in);
+    for (0..grid.X) |x| {
+        for (0..grid.Y) |y| {
+            if (findMAS(grid, x, y, .@"135", .@"315") and findMAS(grid, x, y, .@"45", .@"225")) {
                 answer += 1;
             }
         }
     }
     return answer;
 }
-
-const Board = struct {
-    X: usize,
-    Y: usize,
-    data: []const u8,
-
-    fn init(data: []const u8) Board {
-        var X: usize = 0;
-        var Y: usize = 0;
-        for (0.., data) |i, c| {
-            if (c == '\n') {
-                if (X == 0) {
-                    X = i;
-                }
-                Y += 1;
-            }
-        }
-        return .{
-            .X = X,
-            .Y = Y,
-            .data = data,
-        };
-    }
-
-    fn get(board: Board, ix: isize, iy: isize) ?u8 {
-        if (ix < 0 or iy < 0) {
-            return null;
-        }
-        const x: usize = @intCast(ix);
-        const y: usize = @intCast(iy);
-        if (x >= board.X or y >= board.Y) {
-            return null;
-        }
-        return board.data[x + (board.X + 1) * y];
-    }
-};
 
 const Direction = enum {
     @"0",
@@ -86,7 +52,7 @@ const Direction = enum {
 };
 
 fn find(
-    board: Board,
+    grid: Grid,
     x: usize,
     y: usize,
     word: []const u8,
@@ -110,7 +76,7 @@ fn find(
         const dy = @as(isize, @intCast(i)) * d.dy;
         const ix: isize = @intCast(x);
         const iy: isize = @intCast(y);
-        if (board.get(ix + dx, iy + dy) != c) {
+        if (grid.get(ix + dx, iy + dy) != c) {
             return false;
         }
     }
@@ -118,16 +84,16 @@ fn find(
 }
 
 fn findMAS(
-    board: Board,
+    grid: Grid,
     x: usize,
     y: usize,
     p: Direction,
     q: Direction,
 ) bool {
-    if (find(board, x, y, "AM", p) and find(board, x, y, "AS", q)) {
+    if (find(grid, x, y, "AM", p) and find(grid, x, y, "AS", q)) {
         return true;
     }
-    if (find(board, x, y, "AS", p) and find(board, x, y, "AM", q)) {
+    if (find(grid, x, y, "AS", p) and find(grid, x, y, "AM", q)) {
         return true;
     }
     return false;
