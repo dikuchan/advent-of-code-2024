@@ -2,18 +2,19 @@ const std = @import("std");
 
 const Grid = @import("../Grid.zig");
 
-const N = 100;
-
 pub fn @"1"(in: []const u8) !u64 {
     const grid = Grid.init(in);
+    var seen = [_][grid.Y]bool{
+        [_]bool{false} ** grid.Y,
+    } ** grid.X;
     var guard = findGuard(grid);
-    var seen = StaticSet(u64, N * grid.X * grid.Y).init();
+
     var answer: u64 = 0;
     while (guard.step(grid, -1, -1)) {
-        if (!seen.contains(.{ guard.x, guard.y })) {
+        if (!seen[guard.x][guard.y]) {
             answer += 1;
         }
-        seen.add(.{ guard.x, guard.y });
+        seen[guard.x][guard.y] = true;
     }
     return answer;
 }
@@ -21,6 +22,7 @@ pub fn @"1"(in: []const u8) !u64 {
 pub fn @"2"(in: []const u8) !u64 {
     const grid = Grid.init(in);
     const guard = findGuard(grid);
+
     var answer: u64 = 0;
     for (0..grid.X) |x| {
         for (0..grid.Y) |y| {
@@ -40,12 +42,17 @@ pub fn @"2"(in: []const u8) !u64 {
 
 fn checkLoop(grid: Grid, i: Guard, ex: usize, ey: usize) bool {
     var guard = i;
-    var seen = StaticSet(u64, N * grid.X * grid.Y).init();
+    var seen = [_][grid.Y][4]bool{
+        [_][4]bool{
+            [_]bool{false} ** 4,
+        } ** grid.Y,
+    } ** grid.X;
     while (guard.step(grid, ex, ey)) {
-        if (seen.contains(.{ guard.x, guard.y, @intFromEnum(guard.direction) })) {
+        const direction: usize = @intFromEnum(guard.direction);
+        if (seen[guard.x][guard.y][direction]) {
             return true;
         }
-        seen.add(.{ guard.x, guard.y, @intFromEnum(guard.direction) });
+        seen[guard.x][guard.y][direction] = true;
     }
     return false;
 }
@@ -120,38 +127,6 @@ const Guard = struct {
         }
     }
 };
-
-fn StaticSet(comptime T: type, comptime size: usize) type {
-    return struct {
-        const Self = @This();
-
-        data: [size]bool = [_]bool{false} ** size,
-
-        fn init() Self {
-            return .{};
-        }
-
-        fn add(self: *Self, xs: anytype) void {
-            var hash: T = 0;
-            for (xs) |x| {
-                hash = hashCombine(hash, x);
-            }
-            self.data[hash % size] = true;
-        }
-
-        fn contains(self: Self, xs: anytype) bool {
-            var hash: T = 0;
-            for (xs) |x| {
-                hash = hashCombine(hash, x);
-            }
-            return self.data[hash % size];
-        }
-
-        fn hashCombine(seed: T, x: T) u64 {
-            return seed ^ x + 0x9e3779b9 + (seed << 6) + (seed >> 2);
-        }
-    };
-}
 
 test {
     const in = @embedFile("in_test.txt");
