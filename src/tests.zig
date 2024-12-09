@@ -6,6 +6,7 @@ pub const task_05 = @import("./05/solution.zig");
 pub const task_06 = @import("./06/solution.zig");
 pub const task_07 = @import("./07/solution.zig");
 pub const task_08 = @import("./08/solution.zig");
+pub const task_09 = @import("./09/solution.zig");
 
 test {
     @import("std").testing.refAllDecls(@This());

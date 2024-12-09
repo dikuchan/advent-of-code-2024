@@ -13,6 +13,7 @@ pub fn main() !void {
             6 => solve(@import("./06/solution.zig")),
             7 => solve(@import("./07/solution.zig")),
             8 => solve(@import("./08/solution.zig")),
+            9 => solve(@import("./09/solution.zig")),
             else => @compileError("no such task"),
         };
         @compileLog(

@@ -80,6 +80,15 @@ pub fn parseString(self: *Self, in: []const u8) Error!void {
     self.pos += in.len;
 }
 
+pub fn parseDigit(self: *Self) Error!u8 {
+    const c = self.src[self.pos];
+    if (c >= '0' and c <= '9') {
+        self.pos += 1;
+        return c - '0';
+    }
+    return Error.NoParse;
+}
+
 pub fn parseNumber(self: *Self) Error!u64 {
     var n: u64 = 0;
     for (0.., self.src[self.pos..]) |i, c| {
