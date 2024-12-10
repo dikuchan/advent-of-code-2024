@@ -14,6 +14,7 @@ pub fn main() !void {
             7 => solve(@import("./07/solution.zig")),
             8 => solve(@import("./08/solution.zig")),
             9 => solve(@import("./09/solution.zig")),
+            10 => solve(@import("./10/solution.zig")),
             else => @compileError("no such task"),
         };
         @compileLog(
