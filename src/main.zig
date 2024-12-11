@@ -2,7 +2,7 @@ const std = @import("std");
 
 const task_n = @import("options").task_n;
 
-pub fn main() !void {
+pub fn main() void {
     comptime {
         const answer = switch (task_n) {
             1 => solve(@import("./01/solution.zig")),
@@ -15,6 +15,7 @@ pub fn main() !void {
             8 => solve(@import("./08/solution.zig")),
             9 => solve(@import("./09/solution.zig")),
             10 => solve(@import("./10/solution.zig")),
+            11 => solve(@import("./11/solution.zig")),
             else => @compileError("no such task"),
         };
         @compileLog(
